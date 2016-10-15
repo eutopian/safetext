@@ -1,0 +1,11 @@
+<table>
+<th>Phone Number</th>
+<th>Address</th>
+<tr>
+<% @civilians.each do |civilian| %>
+<td><%= civilian.phone %></td>
+<td><%= civilian.address %></td>
+</tr>
+<% end %>
+
+</table>

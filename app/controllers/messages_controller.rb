@@ -18,20 +18,15 @@ class MessagesController < ApplicationController
   def send_sms
     from = "+16466811567"
 
-    friends = {
-      "+16464840180" => "Curious George",
-      "+17184045360" => "Boots",
-    }
-
     message = params["body"]
 
-    friends.each do |key, value|
+    Civilian.all.each do |civilian|
       @client.account.messages.create(
         :from => from,
-        :to => key,
+        :to => civilian.phone,
         :body => message
       )
-      puts "Sent message to #{value}"
+      puts "Sent message to #{civilian.phone}"
     end
   end
   private
