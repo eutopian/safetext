@@ -3,6 +3,7 @@ class MessagesController < ApplicationController
  before_action :boot_twilio
  
   def reply
+    byebug
     message_body = params["Body"]
     from_number = params["From"]
     civilian = Civilian.find_or_create_by(phone: from_number)
@@ -46,6 +47,7 @@ class MessagesController < ApplicationController
       puts "Sent message to #{civilian.phone}"
   
     end
+    redirect_to civilians_path
   end
   private
  

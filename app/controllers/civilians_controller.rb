@@ -32,8 +32,8 @@ end
 		request.body = question
 		
 		response = http.request(request)
-		puts response.read_body
-		redirect_to civilians_path
+		
+
   end
 
 end
