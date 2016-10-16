@@ -3,8 +3,9 @@
 </div>
 <div class="ui bottom attached segment pushable">
   <div class="ui visible labeled icon left inline vertical sidebar menu">
-    <!-- <h3><%= @civilians.first.questions.first.text %></h3> -->
-
+    <% if @civilians && @civilians.first && @civilians.first.questions && @civilians.first.questions.first %>
+    <h3><%= @civilians.first.questions.first.text %></h3>
+    <% end %>
     <table class="ui selectable table">
       <thead>
         <tr>
@@ -18,9 +19,15 @@
           <tr id="<%= civilian.id %>">
             <td><%= civilian.address %></td>
             <td><%= civilian.phone %></td>
+            <% if civilian && civilian.questions && civilian.questions.first %>
+            <td class="right aligned response <%= civilian.questions.first.answer.response %>">
+              <div></div>
+            </td>
+            <% else %>
             <td class="right aligned response">
               <div></div>
             </td>
+            <% end %>
           </tr>
         <% end %>
       </tbody>
@@ -32,11 +39,6 @@
     </div>
   </div>
 </div>
-
-
-
-
-
 
 <style>
   #map {
@@ -52,11 +54,11 @@
     float: right;
   }
   .response.t div {
-    background: #e00;
+    background: #0f0;
   }
 
   .response.f div {
-    background: #0f0;
+    background: #e00;
   }
 
 
@@ -76,10 +78,9 @@ function initMap() {
     $.get('/civilians.json').done(function(civilians) {
       for(var civilian of civilians) {
         var iconColor;
-
-        // debugger
+        
         if (civilian.questions && civilian.questions[0] && civilian.questions[0].answer) {
-          var answer = civilian.questions[0].answer.response
+          var answer = civilian.questions[0].answer.response\
           setResponse(civilian, answer);
           iconColor = getColor(answer)
         }
@@ -97,7 +98,7 @@ function initMap() {
     $.get(url).done(function(data) {
       var marker = new google.maps.Marker({
         map: map,
-        title: 'one',
+        title: civilian.address,
         position: data["results"][0]["geometry"]["location"],
         icon: `http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|${ color || 'ccc'}`
         
@@ -107,7 +108,9 @@ function initMap() {
 
   function setResponse(civilian, answer) {
     var res_div = $(`tr#${civilian.id} td.response`);
-    res_div.addClass(answer)
+    res_div.removeAttr('class');
+    res_div.attr('class', `right aligned response ${answer}`);
+    return res_div
   }
 
   function getColor(answer) {
