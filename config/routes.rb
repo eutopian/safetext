@@ -8,5 +8,5 @@ Rails.application.routes.draw do
   end
 
   resources :civilians
-
+  get '/dashboard', to: 'dashboard#index'
 end

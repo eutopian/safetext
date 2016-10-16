@@ -1,0 +1,103 @@
+<h3>Emergency Relief Map</h3>
+<!-- <div id="map"></div> -->
+<div id="map" style="width: 100%; height: 700px;"></div>
+
+<!-- <script> 
+  function initialize() {
+    var locations = [
+      ['address', 41.926979,12.517385, 1],
+      ['address', 41.914873,12.506486, 0],
+      ['address', 41.918574,12.507201, 1]
+    ];
+    var addresses = ["11 Broadway, New York, NY 10004", "63 Flushing Brooklyn", "11 Wall St"]
+
+    var map = new google.maps.Map(document.getElementById('map2'), {
+      zoom: 10,
+      center: new google.maps.LatLng(40.923, -74.513), 
+      mapTypeId: 'terrain'
+      // mapTypeId: google.maps.MapTypeId.ROADMAP
+    });
+
+    var infowindow = new google.maps.InfoWindow();
+
+    var marker, i;
+
+    for(var address of addresses) { 
+      // map.setCenter(results[0].geometry.location); 
+      // debugger
+      plot(address)
+
+      google.maps.event.addListener(marker, 'click', (function(marker, i) {
+        return function() {
+          infowindow.setContent(address);
+          infowindow.open(map, marker);
+        }
+      })(marker, i));
+    }
+
+    function plot(address) {
+      var address = address.split(" ").join("+");
+      var url = `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=<%= ENV['google_api_key'] %>`
+      $.get(url).done(function(data) {
+        // debugger
+        marker = new google.maps.Marker({
+          position: data["results"][0]["geometry"]["location"],
+          map: map
+        });     
+      })
+    }
+  }
+
+  function loadScript() {
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&' + 'callback=initialize';
+    document.body.appendChild(script);
+  }
+
+  window.onload = loadScript;
+</script> -->
+
+<style>
+   #map {
+    height: 400px;
+    width: 100%;
+   }
+</style>
+<script> 
+  function initMap() {
+    var civilians;
+    $.get('/civilians.json').done(function(civilians) {
+      // debugger
+      civilians = civilians
+      var center = new google.maps.LatLng(40.2, -74.9);
+      // debugger
+      var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 11,
+        center: center,
+        mapTypeId: 'terrain'
+      });
+
+      var infowindow = new google.maps.InfoWindow();
+      for(var civilian of civilians) {
+        // debugger  
+        plot(civilian.address)
+      }
+
+      function plot(address) {
+        var address = address.split(" ").join("+");
+        var url = `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=<%= ENV['google_api_key'] %>`
+        $.get(url).done(function(data) {
+          var marker = new google.maps.Marker({
+            position: data["results"][0]["geometry"]["location"],
+            map: map,
+            icon: 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|ccc'
+          });     
+        })
+      } 
+    })
+  }
+</script>
+<script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['google_api_key'] %>&callback=initMap">
+</script>
