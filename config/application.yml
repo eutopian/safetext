@@ -11,3 +11,5 @@
 #   stripe_publishable_key: pk_live_9lcthxpSIHbGwmdO941O1XVU
 
 google_api_key: 'AIzaSyDYme5rkFwSAH_HCx1M2XZggxoyb5N_hzU'
+twilio_account_sid: 'AC9c544d285f67150f64c29e0d81fe2486'
+twilio_auth_token: '561193b3f3542f9c0e6986e795e39dd7'
