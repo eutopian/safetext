@@ -3,6 +3,7 @@ class MessagesController < ApplicationController
  before_action :boot_twilio
  
   def reply
+    byebug
     message_body = params["Body"]
     from_number = params["From"]
     civilian = Civilian.find_or_create_by(phone: from_number)
@@ -10,7 +11,7 @@ class MessagesController < ApplicationController
       if params["Body"] == "y" || "yes" || "1" || "Y" || "Yes" || "YES" || "YeS" || "yES" || "yeS" || "T" || "t"
         a = Answer.create(response: true)
         civilian.questions.last.answer = a
-      elsif params["Body"] == "n" || "no" || "0" || "false" || "False" || "Nope"
+      elsif params["Body"] == "n" || "no" || "0" || "false" || "False" || "Nope" 
         a = Answer.create(response: false)
         civilian.questions.last.answer = a
       end
@@ -31,8 +32,8 @@ class MessagesController < ApplicationController
 
   def send_sms
     from = "+16466811567"
-
-    message = params["body"]
+    
+    message = params["question"]["text"]
     Civilian.all.each do |civilian|
       question = Question.create(text:message)
       answer = Answer.create
@@ -40,11 +41,13 @@ class MessagesController < ApplicationController
       @client.account.messages.create(
         :from => from,
         :to => civilian.phone,
-        :body => message
+        :body => message + " Enter [Yn]"
       )
       civilian.questions << question
       puts "Sent message to #{civilian.phone}"
+  
     end
+    redirect_to civilians_path
   end
   private
  
