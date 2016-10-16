@@ -15,34 +15,7 @@
       </thead>
       <tbody>
         <% @civilians.each do |civilian| %>
-          <tr>
-            <td><%= civilian.address %></td>
-            <td><%= civilian.phone %></td>
-            <td class="right aligned response <%= civilian.questions.first.answer.response %>">
-              <div></div>
-            </td>
-          </tr>
-        <% end %>
-        <% @civilians.each do |civilian| %>
-          <tr>
-            <td><%= civilian.address %></td>
-            <td><%= civilian.phone %></td>
-            <td class="right aligned response">
-              <div></div>
-            </td>
-          </tr>
-        <% end %>
-        <% @civilians.each do |civilian| %>
-          <tr>
-            <td><%= civilian.address %></td>
-            <td><%= civilian.phone %></td>
-            <td class="right aligned response <%= civilian.questions.first.answer.response %>">
-              <div></div>
-            </td>
-          </tr>
-        <% end %>
-        <% @civilians.each do |civilian| %>
-          <tr>
+          <tr id="<%= civilian.id %>">
             <td><%= civilian.address %></td>
             <td><%= civilian.phone %></td>
             <td class="right aligned response">
@@ -96,18 +69,22 @@ function initMap() {
     mapTypeId: 'terrain'
   });
 
+  var INTERVAL = 5000;
   setMarkers();
 
   function setMarkers() {
     $.get('/civilians.json').done(function(civilians) {
       for(var civilian of civilians) {
         var iconColor;
+
         // debugger
-        if (civilian.questions) {
-          iconColor = getColor(civilian.questions[0].answer.response)
+        if (civilian.questions && civilian.questions[0] && civilian.questions[0].answer) {
+          var answer = civilian.questions[0].answer.response
+          setResponse(civilian, answer);
+          iconColor = getColor(answer)
         }
-        plot(civilian, iconColor)
-        window.setTimeout(setMarkers, 100000);
+        plot(civilian, iconColor);
+        window.setTimeout(setMarkers, INTERVAL);
       }
     })
   }
@@ -128,13 +105,18 @@ function initMap() {
     })
   }
 
+  function setResponse(civilian, answer) {
+    var res_div = $(`tr#${civilian.id} td.response`);
+    res_div.addClass(answer)
+  }
+
   function getColor(answer) {
     // debugger
     if (answer === "no response") {
-      return;
+      return "";
     }
     else {
-      return answer === "t" ? "0f0" : "f00";
+      return (answer === "t") ? "0f0" : "f00";
     }
   }
 }
