@@ -10,7 +10,7 @@ class MessagesController < ApplicationController
       if params["Body"] == "y" || "yes" || "1" || "Y" || "Yes" || "YES" || "YeS" || "yES" || "yeS" || "T" || "t"
         a = Answer.create(response: true)
         civilian.questions.last.answer = a
-      elsif params["Body"] == "n" || "no" || "0" || "false" || "False" || "Nope"
+      else
         a = Answer.create(response: false)
         civilian.questions.last.answer = a
       end

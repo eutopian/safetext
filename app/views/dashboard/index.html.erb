@@ -1,14 +1,94 @@
-<h3>Emergency Relief Map</h3>
-<!-- <div id="map"></div> -->
-<div id="map" style="width: 100%; height: 700px;"></div>
+<div class="ui top attached demo menu">
+  <a class="item">Responses</a>
+</div>
+<div class="ui bottom attached segment pushable">
+  <div class="ui visible labeled icon left inline vertical sidebar menu">
+    <!-- <h3><%= @civilians.first.questions.first.text %></h3> -->
+
+    <table class="ui selectable table">
+      <thead>
+        <tr>
+          <th>Address</th>
+          <th>Phone Number</th>
+          <th class="right aligned">Response</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @civilians.each do |civilian| %>
+          <tr>
+            <td><%= civilian.address %></td>
+            <td><%= civilian.phone %></td>
+            <td class="right aligned response <%= civilian.questions.first.answer.response %>">
+              <div></div>
+            </td>
+          </tr>
+        <% end %>
+        <% @civilians.each do |civilian| %>
+          <tr>
+            <td><%= civilian.address %></td>
+            <td><%= civilian.phone %></td>
+            <td class="right aligned response">
+              <div></div>
+            </td>
+          </tr>
+        <% end %>
+        <% @civilians.each do |civilian| %>
+          <tr>
+            <td><%= civilian.address %></td>
+            <td><%= civilian.phone %></td>
+            <td class="right aligned response <%= civilian.questions.first.answer.response %>">
+              <div></div>
+            </td>
+          </tr>
+        <% end %>
+        <% @civilians.each do |civilian| %>
+          <tr>
+            <td><%= civilian.address %></td>
+            <td><%= civilian.phone %></td>
+            <td class="right aligned response">
+              <div></div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <div class="pusher">
+    <div class="ui basic segment">
+      <div id="map" style="width: 100%; height: 90vh;"></div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
 
 <style>
-   #map {
+  #map {
     height: 400px;
     width: 100%;
-   }
+  }
+
+  .response div {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #ccc;
+    float: right;
+  }
+  .response.t div {
+    background: #e00;
+  }
+
+  .response.f div {
+    background: #0f0;
+  }
+
+
 </style>
-<script> 
+<script>
 function initMap() {
   var map = new google.maps.Map(document.getElementById('map'), {
     zoom: 11,
@@ -16,18 +96,21 @@ function initMap() {
     mapTypeId: 'terrain'
   });
 
-  var civilians;
-  $.get('/civilians.json').done(function(civilians) {
-    civilians = civilians
-    for(var civilian of civilians) {
-      var iconColor;
-      // debugger
-      if (civilian.questions) {
-        iconColor = getColor(civilian.questions[0].answer.response)
+  setMarkers();
+
+  function setMarkers() {
+    $.get('/civilians.json').done(function(civilians) {
+      for(var civilian of civilians) {
+        var iconColor;
+        // debugger
+        if (civilian.questions) {
+          iconColor = getColor(civilian.questions[0].answer.response)
+        }
+        plot(civilian, iconColor)
+        window.setTimeout(setMarkers, 100000);
       }
-      plot(civilian, iconColor)
-    }
-  })
+    })
+  }
 
   function plot(civilian, color) {
     var address = civilian.address.split(" ").join("+");
@@ -37,10 +120,9 @@ function initMap() {
     $.get(url).done(function(data) {
       var marker = new google.maps.Marker({
         map: map,
+        title: 'one',
         position: data["results"][0]["geometry"]["location"],
-        icon: `http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|${ color || 'ccc'}`,
-        animation: google.maps.Animation.DROP,
-        draggable: true
+        icon: `http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|${ color || 'ccc'}`
         
       });   
     })
