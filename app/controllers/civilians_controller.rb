@@ -7,7 +7,9 @@ def index
   @civilians = Civilian.all
   respond_to do |format|
     format.html {render :show}
-    format.json {render json: @civilians.to_json}
+    format.json {
+      render json: @civilians.to_json(:include => {:questions => {:include => :answer  }})
+    }
   end
 end
 
