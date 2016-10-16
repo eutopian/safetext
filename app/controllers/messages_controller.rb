@@ -7,12 +7,12 @@ class MessagesController < ApplicationController
     from_number = params["From"]
     civilian = Civilian.find_or_create_by(phone: from_number)
     if civilian.address?
-      if params["Body"] == "y" || "yes" || "1" || "Y" || "Yes" || "YES" || "YeS" || "yES" || "yeS" || "T" || "t"
-        a = Answer.create(response: true)
-        civilian.questions.last.answer = a
+      if params["Body"] == "y" || params["Body"] == "Y"
+        a = 't'
+        civilian.questions.last.answer.update(response: a)
       else
-        a = Answer.create(response: false)
-        civilian.questions.last.answer = a
+        a = 'f'
+        civilian.questions.last.answer.update(response: a)
       end
     return sms = @client.messages.create(
       from: "+16466811567",
@@ -31,8 +31,8 @@ class MessagesController < ApplicationController
 
   def send_sms
     from = "+16466811567"
-
-    message = params["body"]
+    
+    message = params["question"]["text"]
     Civilian.all.each do |civilian|
       question = Question.create(text:message)
       answer = Answer.create
@@ -40,11 +40,13 @@ class MessagesController < ApplicationController
       @client.account.messages.create(
         :from => from,
         :to => civilian.phone,
-        :body => message
+        :body => message + " Enter [Yn]"
       )
       civilian.questions << question
       puts "Sent message to #{civilian.phone}"
+  
     end
+    redirect_to civilians_path
   end
   private
  

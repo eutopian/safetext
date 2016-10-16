@@ -1,0 +1,5 @@
+<%= form_for @question, :url => url_for(:controller => 'messages', :action => 'send_sms'), method: "post" do |f|%>
+
+New Question: <%= f.text_field :text %>
+<%= f.submit "Submit" %>
+<% end %>
