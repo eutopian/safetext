@@ -3,17 +3,16 @@ class MessagesController < ApplicationController
  before_action :boot_twilio
  
   def reply
-    byebug
     message_body = params["Body"]
     from_number = params["From"]
     civilian = Civilian.find_or_create_by(phone: from_number)
     if civilian.address?
-      if params["Body"] == "y" || "yes" || "1" || "Y" || "Yes" || "YES" || "YeS" || "yES" || "yeS" || "T" || "t"
-        a = Answer.create(response: true)
-        civilian.questions.last.answer = a
-      elsif params["Body"] == "n" || "no" || "0" || "false" || "False" || "Nope" 
-        a = Answer.create(response: false)
-        civilian.questions.last.answer = a
+      if params["Body"] == "y" || params["Body"] == "Y"
+        a = 't'
+        civilian.questions.last.answer.update(response: a)
+      else
+        a = 'f'
+        civilian.questions.last.answer.update(response: a)
       end
     return sms = @client.messages.create(
       from: "+16466811567",
