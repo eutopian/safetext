@@ -1,5 +1,4 @@
 class Civilian < ActiveRecord::Base
-  has_many :civilian_questions
-  has_many :questions, through: :civilian_questions
-  has_many :answers
+  has_many :questions
+  has_many :answers, through: :questions
 end

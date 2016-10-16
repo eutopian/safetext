@@ -1,10 +1,20 @@
 <table>
 <th>Phone Number</th>
 <th>Address</th>
+<% if @civilians && @civilians.first && @civilians.first.questions %>
+<% @civilians.first.questions.each do |question| %>
+<th> <%= question.text %> </th>
+<% end %>
+<% end %>
 <tr>
 <% @civilians.each do |civilian| %>
 <td><%= civilian.phone %></td>
 <td><%= civilian.address %></td>
+ <% civilian.questions.each do |question| %>
+ <% if question.answer %>
+  <td> <%= question.answer.response %> </td>
+<% end %>
+<% end %>
 </tr>
 <% end %>
 

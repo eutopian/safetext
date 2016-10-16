@@ -11,21 +11,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161015184805) do
+ActiveRecord::Schema.define(version: 20161015184150) do
 
   create_table "answers", force: :cascade do |t|
-    t.boolean  "response"
-    t.integer  "civilian_id"
+    t.string   "response",    default: "no response"
     t.integer  "question_id"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
-  end
-
-  create_table "civilian_questions", force: :cascade do |t|
-    t.integer  "civilian_id"
-    t.integer  "question_id"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
   end
 
   create_table "civilians", force: :cascade do |t|
@@ -37,10 +29,9 @@ ActiveRecord::Schema.define(version: 20161015184805) do
 
   create_table "questions", force: :cascade do |t|
     t.string   "text"
-    t.integer  "answer_id"
-    t.datetime "created_at",            null: false
-    t.datetime "updated_at",            null: false
-    t.integer  "civilian_questions_id"
+    t.integer  "civilian_id"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
   end
 
 end

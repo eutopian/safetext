@@ -6,8 +6,22 @@ class MessagesController < ApplicationController
     message_body = params["Body"]
     from_number = params["From"]
     civilian = Civilian.find_or_create_by(phone: from_number)
-    civilian.update(address: message_body) 
-    boot_twilio
+    if civilian.address?
+      if params["Body"] == "y" || "yes" || "1" || "Y" || "Yes" || "YES" || "YeS" || "yES" || "yeS" || "T" || "t"
+        a = Answer.create(response: true)
+        civilian.questions.last.answer = a
+      elsif params["Body"] == "n" || "no" || "0" || "false" || "False" || "Nope"
+        a = Answer.create(response: false)
+        civilian.questions.last.answer = a
+      end
+    return sms = @client.messages.create(
+      from: "+16466811567",
+      to: from_number,
+      body: "Thank you. Your answer has been recorded and we will act accordingly."
+      )
+    else  
+      civilian.update(address: message_body)
+    end
     sms = @client.messages.create(
       from: "+16466811567",
       to: from_number,
@@ -19,13 +33,16 @@ class MessagesController < ApplicationController
     from = "+16466811567"
 
     message = params["body"]
-
     Civilian.all.each do |civilian|
+      question = Question.create(text:message)
+      answer = Answer.create
+      question.answer = answer
       @client.account.messages.create(
         :from => from,
         :to => civilian.phone,
         :body => message
       )
+      civilian.questions << question
       puts "Sent message to #{civilian.phone}"
     end
   end
