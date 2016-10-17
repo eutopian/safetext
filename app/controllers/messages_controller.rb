@@ -46,7 +46,10 @@ class MessagesController < ApplicationController
       puts "Sent message to #{civilian.phone}"
   
     end
-    redirect_to civilians_path
+    @survey_sent = "sent"
+    # @message_sent = true
+    # redirect_to dashboard_path
+    render json: @survey_sent, status: 201
   end
   private
  

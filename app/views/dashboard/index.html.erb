@@ -1,12 +1,17 @@
 <div class="ui top attached demo menu">
   <a class="item">Responses</a>
+  <%= form_for @question, :url => url_for(:controller => 'messages', :action => 'send_sms'), method: "post" do |f|%>
+
+    New Question: <%= f.text_field :text %>
+    <%= f.submit "Submit" %>
+  <% end %>
 </div>
 <div class="ui bottom attached segment pushable">
   <div class="ui visible labeled icon left inline vertical sidebar menu">
     <% if @civilians && @civilians.first && @civilians.first.questions && @civilians.first.questions.first %>
-    <h3><%= @civilians.first.questions.first.text %></h3>
+    <h3 id="question"></h3>
     <% end %>
-    <table class="ui selectable table">
+    <table class="ui selectable table" id="response">
       <thead>
         <tr>
           <th>Address</th>
@@ -15,7 +20,7 @@
         </tr>
       </thead>
       <tbody>
-        <% @civilians.each do |civilian| %>
+       <!--  <% @civilians.each do |civilian| %>
           <tr id="<%= civilian.id %>">
             <td><%= civilian.address %></td>
             <td><%= civilian.phone %></td>
@@ -29,7 +34,7 @@
             </td>
             <% end %>
           </tr>
-        <% end %>
+        <% end %> -->
       </tbody>
     </table>
   </div>
@@ -50,9 +55,12 @@
     width: 15px;
     height: 15px;
     border-radius: 50%;
-    background: #ccc;
     float: right;
   }
+  .response.no div {
+    background: #ccc;
+  }
+
   .response.t div {
     background: #0f0;
   }
@@ -65,22 +73,69 @@
 </style>
 <script>
 function initMap() {
+  var showTargetsInterval;
+  var INTERVAL = 10000
+  var showTargets = function () {
+    // debugger
+    $.get('/civilians.json').done(function(civilians) {
+      var tbody = $("table#response tbody");
+      // debugger
+      tbody.empty();
+      for(var civilian of civilians) {
+        var answer = "";
+        if (civilian.questions && civilian.questions[0] && civilian.questions[0].answer) {
+          var answer = civilian.questions[0].answer.response;
+        }
+        var tr = `<tr id="${civilian.id}">
+            <td>${civilian.address}</td>
+            <td>${civilian.phone}</td>
+            <td class="right aligned response ${answer}">
+              <div></div>
+            </td>
+          </tr>`
+        // debugger
+        tbody.append(tr)
+      }
+      setMarkers()
+    })
+    // debugger
+
+    showTargetsInterval = window.setTimeout(showTargets, INTERVAL)
+  };
+
+  setMarkers();  
+  sendSurvey();
+  showTargets();
+  
+  
+
   var map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 11,
+    zoom: 12,
     center: new google.maps.LatLng(40.7128, -74.0059),
     mapTypeId: 'terrain'
   });
 
-  var INTERVAL = 5000;
-  setMarkers();
+  
+
+  // clearOverlays
+  var markersArray = []
+  google.maps.Map.prototype.clearOverlays = function() {
+    for (var i = 0; i < markersArray.length; i++ ) {
+      markersArray[i].setMap(null);
+    }
+    markersArray.length = 0;
+  }
+  
 
   function setMarkers() {
     $.get('/civilians.json').done(function(civilians) {
       for(var civilian of civilians) {
         var iconColor;
-        
+
+        $()
+
         if (civilian.questions && civilian.questions[0] && civilian.questions[0].answer) {
-          var answer = civilian.questions[0].answer.response\
+          var answer = civilian.questions[0].answer.response;
           setResponse(civilian, answer);
           iconColor = getColor(answer)
         }
@@ -91,6 +146,8 @@ function initMap() {
   }
 
   function plot(civilian, color) {
+    // debugger
+    map.clearOverlays();
     var address = civilian.address.split(" ").join("+");
     // var iconColor = return civilian.questions[-1].answer ? 
     var iconColor = 'ccc';
@@ -100,9 +157,11 @@ function initMap() {
         map: map,
         title: civilian.address,
         position: data["results"][0]["geometry"]["location"],
-        icon: `http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|${ color || 'ccc'}`
+        icon: `http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|${ color || 'ccc'}`,
+        draggable: true
         
-      });   
+      });
+      markersArray.push(marker)  
     })
   }
 
@@ -121,6 +180,33 @@ function initMap() {
     else {
       return (answer === "t") ? "0f0" : "f00";
     }
+  }
+
+  // var interval;
+
+  function sendSurvey() {
+    $("form.new_question").click(function(e) {
+
+    })
+    $("form.new_question").on('submit',function(e) {
+      e.preventDefault();
+      var params = $(this).serialize();
+      $.post('/messages/send_sms', params).done(function(message) {
+        debugger;
+        successSurvey(this);
+      }).fail(function(error) {
+        successSurvey(this);
+      })
+    })
+
+    // clearTimeout(showTargetsIntervalsss)
+  }
+
+  function successSurvey(form) {
+    showTargets = function() {return}
+    // var question = form.find("input[type=text]").val();
+    // debugger;
+    // $("#question").text(question)
   }
 }
 </script>
