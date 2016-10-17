@@ -1,6 +1,7 @@
-class MessagesController < ApplicationController 
+class MessagesController < ApplicationController
  skip_before_filter :verify_authenticity_token
  before_action :boot_twilio
+
  
   def reply
     message_body = params["Body"]
@@ -19,7 +20,7 @@ class MessagesController < ApplicationController
       to: from_number,
       body: "Thank you. Your answer has been recorded and we will act accordingly."
       )
-    else  
+    else
       civilian.update(address: message_body)
     end
     sms = @client.messages.create(
@@ -31,7 +32,7 @@ class MessagesController < ApplicationController
 
   def send_sms
     from = "+16466811567"
-    
+
     message = params["question"]["text"]
     Civilian.all.each do |civilian|
       question = Question.create(text:message)
@@ -44,7 +45,7 @@ class MessagesController < ApplicationController
       )
       civilian.questions << question
       puts "Sent message to #{civilian.phone}"
-  
+
     end
     @survey_sent = "sent"
     # @message_sent = true
@@ -52,7 +53,7 @@ class MessagesController < ApplicationController
     render json: @survey_sent, status: 201
   end
   private
- 
+
   def boot_twilio
     account_sid = 'AC9c544d285f67150f64c29e0d81fe2486' # ENV['AC9c544d285f67150f64c29e0d81fe2486']
     auth_token = '561193b3f3542f9c0e6986e795e39dd7' # ENV['561193b3f3542f9c0e6986e795e39dd7']
